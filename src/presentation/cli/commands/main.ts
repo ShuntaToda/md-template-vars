@@ -3,6 +3,7 @@ import { watch } from "node:fs";
 import { resolve } from "node:path";
 import { processTemplates } from "../../../application/use-cases/process-templates.js";
 import { renameVariable } from "../../../application/use-cases/rename-variable.js";
+import { listVariables } from "../../../application/use-cases/list-variables.js";
 import { VariablesFileNotFoundError, SameInputOutputError, InvalidVariablesError } from "../../../shared/errors.js";
 
 interface ProcessOptions {
@@ -105,8 +106,55 @@ export const mainCommand = defineCommand({
       type: "string",
       description: "Variable name to rename to (use with --rename-from)",
     },
+    "list-vars": {
+      type: "boolean",
+      description: "List all variables used in templates",
+      default: false,
+    },
   },
   async run({ args }) {
+    // Handle list-vars mode
+    if (args["list-vars"]) {
+      try {
+        const result = await listVariables({
+          input: args.input,
+          vars: args.vars,
+          include: args.include,
+          exclude: args.exclude,
+        });
+
+        if (result.variables.length === 0 && result.unusedVariables.length === 0) {
+          console.log("No variables found");
+          return;
+        }
+
+        if (result.variables.length > 0) {
+          console.log("Variables used in templates:\n");
+          for (const v of result.variables) {
+            const status = v.isDefined ? "✓" : "✗ undefined";
+            console.log(`  ${v.name} (${status})`);
+            for (const file of v.files) {
+              console.log(`    → ${file}`);
+            }
+          }
+        }
+
+        if (result.unusedVariables.length > 0) {
+          console.log("\nUnused variables (defined but not used):\n");
+          for (const name of result.unusedVariables) {
+            console.log(`  ${name}`);
+          }
+        }
+      } catch (error) {
+        if (error instanceof VariablesFileNotFoundError) {
+          console.error(`Error: ${error.message}`);
+          process.exit(1);
+        }
+        throw error;
+      }
+      return;
+    }
+
     // Handle rename mode
     if (args["rename-from"] || args["rename-to"]) {
       if (!args["rename-from"] || !args["rename-to"]) {

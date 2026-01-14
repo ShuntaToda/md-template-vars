@@ -37,6 +37,7 @@ md-template-vars <input> <output> [options]
 | `--watch`       | `false`          | Watch for file changes and rebuild automatically    |
 | `--rename-from` | -                | Variable name to rename from (use with --rename-to) |
 | `--rename-to`   | -                | Variable name to rename to (use with --rename-from) |
+| `--list-vars`   | `false`          | List all variables used in templates                |
 
 ## Examples
 
@@ -89,6 +90,30 @@ md-template-vars ./templates ./output --rename-from "database.host" --rename-to 
 This updates:
 - All `{{oldName}}` occurrences in template files → `{{newName}}`
 - The key in the variables YAML file
+
+### List variables
+
+Show all variables used in templates and their status:
+
+```bash
+md-template-vars ./templates ./output --list-vars
+```
+
+Output:
+
+```
+Variables used in templates:
+
+  app.name (✓)
+    → README.md
+    → config.md
+  api.key (✗ undefined)
+    → config.md
+
+Unused variables (defined but not used):
+
+  deprecated.setting
+```
 
 ## Template Syntax
 
