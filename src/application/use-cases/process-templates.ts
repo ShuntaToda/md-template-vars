@@ -6,9 +6,7 @@ import { readTemplate, writeTemplate } from "../../infrastructure/repositories/t
 import { scanTemplates } from "../../infrastructure/services/file-scanner.js";
 import { renderTemplate } from "../../domain/services/template-renderer.js";
 
-export async function processTemplates(
-  options: CliOptions
-): Promise<ProcessResult> {
+export async function processTemplates(options: CliOptions): Promise<ProcessResult> {
   const inputDir = resolve(options.input);
   const outputDir = resolve(options.output);
 
@@ -19,7 +17,7 @@ export async function processTemplates(
   const variables = loadVariables(options.vars);
 
   const files = await scanTemplates(inputDir, {
-    include: options.include,
+    only: options.only,
     exclude: options.exclude,
   });
 

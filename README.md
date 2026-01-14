@@ -34,7 +34,7 @@ docvars <input> <output> [options]
 | Option          | Default          | Description                                         |
 | --------------- | ---------------- | --------------------------------------------------- |
 | `--vars`        | `variables.yaml` | Path to the variables YAML file                     |
-| `--include`     | -                | Glob pattern to include specific files              |
+| `--only`        | `**/*`           | Glob pattern to filter files (e.g. **/*.md)         |
 | `--exclude`     | -                | Glob pattern to exclude specific files              |
 | `--watch`       | `false`          | Watch for file changes and rebuild automatically    |
 | `--rename-from` | -                | Variable name to rename from (use with --rename-to) |
@@ -59,12 +59,20 @@ docvars ./templates ./output --vars production.yaml
 ### Filter files
 
 ```bash
-# Include only files matching pattern
-docvars ./templates ./output --include "api-*.md"
+# Process only markdown files
+docvars ./templates ./output --only "**/*.md"
+
+# Process multiple file types
+docvars ./templates ./output --only "**/*.{md,html,txt}"
+
+# Process only files matching pattern
+docvars ./templates ./output --only "api-*.md"
 
 # Exclude files matching pattern
 docvars ./templates ./output --exclude "draft-*.md"
 ```
+
+By default, all text files are processed (binary files like images are automatically excluded).
 
 ### Watch mode
 
@@ -72,11 +80,30 @@ docvars ./templates ./output --exclude "draft-*.md"
 docvars ./templates ./output --watch
 ```
 
-This will watch for changes in:
-- Template files in the input directory
-- The variables YAML file
+Output:
 
-When changes are detected, templates are automatically rebuilt.
+```
+👁 Watch mode enabled
+
+┌───────────┬─────────────────────────┐
+│ Templates │ /path/to/templates      │
+│ Variables │ /path/to/variables.yaml │
+└───────────┴─────────────────────────┘
+
+Waiting for changes... (Ctrl+C to stop)
+
+👀 Change detected: README.md (change)
+
+✨ Build complete
+
+┌───────────┬────────┐
+│ File      │ Status │
+├───────────┼────────┤
+│ README.md │ ✓ done │
+└───────────┴────────┘
+
+Processed: 1 file(s)
+```
 
 ### Rename variables
 
@@ -90,9 +117,21 @@ docvars ./templates ./output --rename-from "name" --rename-to "title"
 docvars ./templates ./output --rename-from "database.host" --rename-to "db.host"
 ```
 
-This updates:
-- All `{{oldName}}` occurrences in template files → `{{newName}}`
-- The key in the variables YAML file
+Output:
+
+```
+✏️  Rename complete
+   database.host → db.host
+
+┌────────────────┬───────────┐
+│ File           │ Status    │
+├────────────────┼───────────┤
+│ variables.yaml │ ✓ updated │
+│ README.md      │ ✓ updated │
+└────────────────┴───────────┘
+
+Updated: 2 file(s)
+```
 
 ### List variables
 
@@ -105,17 +144,20 @@ docvars ./templates ./output --list-vars
 Output:
 
 ```
-Variables used in templates:
+📋 Variables
 
-  app.name (✓)
-    → README.md
-    → config.md
-  api.key (✗ undefined)
-    → config.md
+┌─────────────────┬─────────────┬───────────┐
+│ Variable        │ Status      │ Used in   │
+├─────────────────┼─────────────┼───────────┤
+│ app.name        │ ✓ defined   │ README.md │
+│ api.key         │ ✗ undefined │ config.md │
+└─────────────────┴─────────────┴───────────┘
 
-Unused variables (defined but not used):
+⚠ Unused variables (defined but not used):
 
   deprecated.setting
+
+Summary: 1 defined · 1 undefined · 1 unused
 ```
 
 ### Dry run
@@ -129,19 +171,18 @@ docvars ./templates ./output --dry-run
 Output:
 
 ```
-Dry run - no files written
+🔍 Dry run - no files written
 
-Files to create (1):
-  + config.md
+┌──────────────┬─────────────┐
+│ File         │ Status      │
+├──────────────┼─────────────┤
+│ config.md    │ + create    │
+│ README.md    │ ~ update    │
+│ api.md       │ ~ update    │
+│ changelog.md │ = unchanged │
+└──────────────┴─────────────┘
 
-Files to update (2):
-  ~ README.md
-  ~ api.md
-
-Files unchanged (1):
-  = changelog.md
-
-Summary: 1 create, 2 update, 1 unchanged
+Summary: 1 create · 2 update · 1 unchanged
 ```
 
 ## Template Syntax

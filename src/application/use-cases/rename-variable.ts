@@ -8,7 +8,7 @@ export interface RenameOptions {
   vars: string;
   from: string;
   to: string;
-  include?: string;
+  only?: string;
   exclude?: string;
 }
 
@@ -22,7 +22,7 @@ function escapeRegex(str: string): string {
 }
 
 export async function renameVariable(options: RenameOptions): Promise<RenameResult> {
-  const { input, vars, from, to, include, exclude } = options;
+  const { input, vars, from, to, only, exclude } = options;
 
   if (!existsSync(vars)) {
     throw new VariablesFileNotFoundError(vars);
@@ -34,7 +34,7 @@ export async function renameVariable(options: RenameOptions): Promise<RenameResu
   };
 
   // Rename in template files
-  const templateFiles = await scanTemplates(input, { include, exclude });
+  const templateFiles = await scanTemplates(input, { only, exclude });
   const pattern = new RegExp(`\\{\\{${escapeRegex(from)}(\\}\\}|\\|)`, "g");
 
   for (const file of templateFiles) {

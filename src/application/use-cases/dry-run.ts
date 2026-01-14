@@ -30,7 +30,7 @@ export async function dryRun(options: CliOptions): Promise<DryRunResult> {
   const variables = loadVariables(options.vars);
 
   const files = await scanTemplates(inputDir, {
-    include: options.include,
+    only: options.only,
     exclude: options.exclude,
   });
 

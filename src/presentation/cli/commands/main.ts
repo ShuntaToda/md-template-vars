@@ -13,7 +13,7 @@ interface ProcessOptions {
   input: string;
   output: string;
   vars: string;
-  include?: string;
+  only?: string;
   exclude?: string;
 }
 
@@ -116,9 +116,9 @@ export const mainCommand = defineCommand({
       description: "Path to variables YAML file",
       default: "variables.yaml",
     },
-    include: {
+    only: {
       type: "string",
-      description: "Glob pattern to include files",
+      description: "Glob pattern to filter files (e.g. **/*.md)",
     },
     exclude: {
       type: "string",
@@ -156,7 +156,7 @@ export const mainCommand = defineCommand({
           input: args.input,
           output: args.output,
           vars: args.vars,
-          include: args.include,
+          only: args.only,
           exclude: args.exclude,
         });
 
@@ -230,7 +230,7 @@ export const mainCommand = defineCommand({
         const result = await listVariables({
           input: args.input,
           vars: args.vars,
-          include: args.include,
+          only: args.only,
           exclude: args.exclude,
         });
 
@@ -298,7 +298,7 @@ export const mainCommand = defineCommand({
           vars: args.vars,
           from: args["rename-from"],
           to: args["rename-to"],
-          include: args.include,
+          only: args.only,
           exclude: args.exclude,
         });
 
@@ -346,7 +346,7 @@ export const mainCommand = defineCommand({
       input: args.input,
       output: args.output,
       vars: args.vars,
-      include: args.include,
+      only: args.only,
       exclude: args.exclude,
     };
 

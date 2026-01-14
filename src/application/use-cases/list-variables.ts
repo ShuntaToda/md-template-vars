@@ -7,7 +7,7 @@ import { VariablesFileNotFoundError } from "../../shared/errors.js";
 export interface ListVariablesOptions {
   input: string;
   vars: string;
-  include?: string;
+  only?: string;
   exclude?: string;
 }
 
@@ -25,7 +25,7 @@ export interface ListVariablesResult {
 const VARIABLE_PATTERN = /\{\{([\w.]+)\}\}/g;
 
 export async function listVariables(options: ListVariablesOptions): Promise<ListVariablesResult> {
-  const { input, vars, include, exclude } = options;
+  const { input, vars, only, exclude } = options;
 
   if (!existsSync(vars)) {
     throw new VariablesFileNotFoundError(vars);
@@ -36,7 +36,7 @@ export async function listVariables(options: ListVariablesOptions): Promise<List
   const definedVarNames = new Set(Object.keys(definedVars));
 
   // Scan templates and extract variable usage
-  const templateFiles = await scanTemplates(input, { include, exclude });
+  const templateFiles = await scanTemplates(input, { only, exclude });
   const variableUsageMap = new Map<string, Set<string>>();
 
   for (const file of templateFiles) {
