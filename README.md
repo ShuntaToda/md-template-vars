@@ -83,6 +83,34 @@ project: My Project
 Welcome to My Project!
 ```
 
+### Nested Variables
+
+You can use nested objects in your variables file and access them with dot notation:
+
+**Template:**
+```markdown
+# {{app.name}}
+
+Database: {{database.host}}:{{database.port}}
+```
+
+**Variables (variables.yaml):**
+```yaml
+app:
+  name: My App
+
+database:
+  host: localhost
+  port: 5432
+```
+
+**Output:**
+```markdown
+# My App
+
+Database: localhost:5432
+```
+
 ## Error Handling
 
 | Case                        | Behavior                                            |
