@@ -1,10 +1,66 @@
 import { defineCommand } from "citty";
+import { watch } from "node:fs";
+import { resolve } from "node:path";
 import { processTemplates } from "../../../application/use-cases/process-templates.js";
-import {
-  VariablesFileNotFoundError,
-  SameInputOutputError,
-  InvalidVariablesError,
-} from "../../../shared/errors.js";
+import { VariablesFileNotFoundError, SameInputOutputError, InvalidVariablesError } from "../../../shared/errors.js";
+
+interface ProcessOptions {
+  input: string;
+  output: string;
+  vars: string;
+  include?: string;
+  exclude?: string;
+}
+
+async function runProcess(options: ProcessOptions): Promise<boolean> {
+  try {
+    const result = await processTemplates(options);
+
+    for (const warning of result.warnings) {
+      console.warn(warning);
+    }
+
+    console.log(`Processed ${result.processedFiles.length} file(s)`);
+    for (const file of result.processedFiles) {
+      console.log(`  - ${file}`);
+    }
+    return true;
+  } catch (error) {
+    if (
+      error instanceof VariablesFileNotFoundError ||
+      error instanceof SameInputOutputError ||
+      error instanceof InvalidVariablesError
+    ) {
+      console.error(`Error: ${error.message}`);
+      return false;
+    }
+    throw error;
+  }
+}
+
+function startWatch(options: ProcessOptions): void {
+  const inputPath = resolve(options.input);
+  const varsPath = resolve(options.vars);
+
+  let debounceTimer: NodeJS.Timeout | null = null;
+
+  const handleChange = () => {
+    if (debounceTimer) {
+      clearTimeout(debounceTimer);
+    }
+    debounceTimer = setTimeout(async () => {
+      console.log("\n--- Change detected, rebuilding... ---\n");
+      await runProcess(options);
+    }, 100);
+  };
+
+  console.log(`\nWatching for changes...`);
+  console.log(`  - Templates: ${inputPath}`);
+  console.log(`  - Variables: ${varsPath}\n`);
+
+  watch(inputPath, { recursive: true }, handleChange);
+  watch(varsPath, handleChange);
+}
 
 export const mainCommand = defineCommand({
   meta: {
@@ -35,35 +91,30 @@ export const mainCommand = defineCommand({
       type: "string",
       description: "Glob pattern to exclude files",
     },
+    watch: {
+      type: "boolean",
+      description: "Watch for file changes and rebuild automatically",
+      default: false,
+    },
   },
   async run({ args }) {
-    try {
-      const result = await processTemplates({
-        input: args.input,
-        output: args.output,
-        vars: args.vars,
-        include: args.include,
-        exclude: args.exclude,
-      });
+    const options: ProcessOptions = {
+      input: args.input,
+      output: args.output,
+      vars: args.vars,
+      include: args.include,
+      exclude: args.exclude,
+    };
 
-      for (const warning of result.warnings) {
-        console.warn(warning);
-      }
+    const success = await runProcess(options);
 
-      console.log(`Processed ${result.processedFiles.length} file(s)`);
-      for (const file of result.processedFiles) {
-        console.log(`  - ${file}`);
+    if (args.watch) {
+      if (!success) {
+        console.log("\nFix errors and save to retry...\n");
       }
-    } catch (error) {
-      if (
-        error instanceof VariablesFileNotFoundError ||
-        error instanceof SameInputOutputError ||
-        error instanceof InvalidVariablesError
-      ) {
-        console.error(`Error: ${error.message}`);
-        process.exit(1);
-      }
-      throw error;
+      startWatch(options);
+    } else if (!success) {
+      process.exit(1);
     }
   },
 });

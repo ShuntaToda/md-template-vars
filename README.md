@@ -29,11 +29,12 @@ md-template-vars <input> <output> [options]
 
 ### Options
 
-| Option      | Default          | Description                            |
-| ----------- | ---------------- | -------------------------------------- |
-| `--vars`    | `variables.yaml` | Path to the variables YAML file        |
-| `--include` | -                | Glob pattern to include specific files |
-| `--exclude` | -                | Glob pattern to exclude specific files |
+| Option      | Default          | Description                                      |
+| ----------- | ---------------- | ------------------------------------------------ |
+| `--vars`    | `variables.yaml` | Path to the variables YAML file                  |
+| `--include` | -                | Glob pattern to include specific files           |
+| `--exclude` | -                | Glob pattern to exclude specific files           |
+| `--watch`   | `false`          | Watch for file changes and rebuild automatically |
 
 ## Examples
 
@@ -58,6 +59,18 @@ md-template-vars ./templates ./output --include "api-*.md"
 # Exclude files matching pattern
 md-template-vars ./templates ./output --exclude "draft-*.md"
 ```
+
+### Watch mode
+
+```bash
+md-template-vars ./templates ./output --watch
+```
+
+This will watch for changes in:
+- Template files in the input directory
+- The variables YAML file
+
+When changes are detected, templates are automatically rebuilt.
 
 ## Template Syntax
 
