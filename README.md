@@ -31,16 +31,16 @@ docvars <input> <output> [options]
 
 ### Options
 
-| Option          | Default          | Description                                         |
-| --------------- | ---------------- | --------------------------------------------------- |
-| `--vars`        | `variables.yaml` | Path to the variables YAML file                     |
-| `--only`        | `**/*`           | Glob pattern to filter files (e.g. **/*.md)         |
-| `--exclude`     | -                | Glob pattern to exclude specific files              |
-| `--watch`       | `false`          | Watch for file changes and rebuild automatically    |
-| `--rename-from` | -                | Variable name to rename from (use with --rename-to) |
-| `--rename-to`   | -                | Variable name to rename to (use with --rename-from) |
-| `--list-vars`   | `false`          | List all variables used in templates                |
-| `--dry-run`     | `false`          | Preview changes without writing files               |
+| Option          | Alias | Default          | Description                                         |
+| --------------- | ----- | ---------------- | --------------------------------------------------- |
+| `--vars`        | `-v`  | `variables.yaml` | Path to the variables YAML file                     |
+| `--only`        | `-o`  | `**/*`           | Glob pattern to filter files (e.g. **/*.md)         |
+| `--exclude`     | `-e`  | -                | Glob pattern to exclude specific files              |
+| `--watch`       | `-w`  | `false`          | Watch for file changes and rebuild automatically    |
+| `--rename-from` | `-r`  | -                | Variable name to rename from (use with --rename-to) |
+| `--rename-to`   | `-t`  | -                | Variable name to rename to (use with --rename-from) |
+| `--list-vars`   | `-l`  | `false`          | List all variables used in templates                |
+| `--dry-run`     | `-d`  | `false`          | Preview changes without writing files               |
 
 ## Examples
 

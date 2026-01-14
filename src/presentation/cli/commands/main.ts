@@ -113,37 +113,45 @@ export const mainCommand = defineCommand({
     },
     vars: {
       type: "string",
+      alias: "v",
       description: "Path to variables YAML file",
       default: "variables.yaml",
     },
     only: {
       type: "string",
+      alias: "o",
       description: "Glob pattern to filter files (e.g. **/*.md)",
     },
     exclude: {
       type: "string",
+      alias: "e",
       description: "Glob pattern to exclude files",
     },
     watch: {
       type: "boolean",
+      alias: "w",
       description: "Watch for file changes and rebuild automatically",
       default: false,
     },
     "rename-from": {
       type: "string",
+      alias: "r",
       description: "Variable name to rename from (use with --rename-to)",
     },
     "rename-to": {
       type: "string",
+      alias: "t",
       description: "Variable name to rename to (use with --rename-from)",
     },
     "list-vars": {
       type: "boolean",
+      alias: "l",
       description: "List all variables used in templates",
       default: false,
     },
     "dry-run": {
       type: "boolean",
+      alias: "d",
       description: "Preview changes without writing files",
       default: false,
     },
